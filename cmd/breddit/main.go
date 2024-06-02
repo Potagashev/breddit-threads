@@ -6,9 +6,11 @@ import (
 	"log"
 	"log/slog"
 	"os"
-
 	"github.com/Potagashev/breddit/internal/config"
+	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/Potagashev/breddit/internal/threads"
+	"github.com/Potagashev/breddit/internal/router"
 )
 
 
@@ -27,9 +29,25 @@ func main() {
 	initTables(cfg.DbUrl)
 	logger.Info("db tables created")
 
-	// TODO init router: chi, "chi render"
+	conn, err := pgx.Connect(context.Background(), cfg.DbUrl)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer conn.Close(context.Background())
 
-	// TODO run server
+	threads_repository := threads.NewThreadRepository(conn)
+	threads_service := threads.NewThreadService(threads_repository)
+	
+	r := router.NewRouter(threads_service)
+	
+	r.Run("localhost:8080")
+}
+
+func getHelloWorld(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "Hello World!",
+	})
 }
 
 func setupLogger(env string) *slog.Logger {
@@ -68,8 +86,8 @@ func initTables(dbUrl string) error {
 			id UUID PRIMARY KEY,
 			title TEXT NOT NULL,
 			text TEXT NOT NULL,
-			created_at TIMESTAMPTZ NOT NULL,
-			updated_at TIMESTAMPTZ NOT NULL
+			created_at TIMESTAMPTZ NOT NULL default now(),
+			updated_at TIMESTAMPTZ NOT NULL default now()
 		)
 		`,
 	)

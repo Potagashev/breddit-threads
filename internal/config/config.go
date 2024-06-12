@@ -7,16 +7,17 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type Config struct {
-	Env        string `yaml:"env"`
-	DbUrl      string `yaml:"db_url" env-required:"true"`
-	// HTTPServer string `yaml:"http_server"`
+
+type HTTPServerConfig struct {
+	Host    string        `yaml:"host" env-default:"0.0.0.0"`
+	Port    string        `yaml:"port" env-default:"8080"`
+	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
 }
 
-type HTTPServer struct {
-	Host    string  `yaml:"host" env-default:"0.0.0.0"`
-	Port    string  `yaml:"port" env-default:"8080"`
-	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
+type Config struct {
+	Env     string         `yaml:"env"`
+	DbUrl   string         `yaml:"db_url" env-required:"true"`
+	HTTP    HTTPServerConfig
 }
 
 func MustLoad() Config {

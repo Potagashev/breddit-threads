@@ -2,19 +2,26 @@ package router
 
 import (
     "github.com/gin-gonic/gin"
+    _ "github.com/Potagashev/breddit/docs"
+    swaggerFiles "github.com/swaggo/files"
+    ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/Potagashev/breddit/internal/threads"
 )
 
-func NewRouter(userService *threads.ThreadService) *gin.Engine {
+func NewRouter(threadService *threads.ThreadService) *gin.Engine {
     router := gin.Default()
 
-    threadHandler := threads.NewThreadHandler(userService)
+    router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	router.POST("/threads", threadHandler.CreateThread)
-    router.GET("/threads/:id", threadHandler.GetThread)
-	router.GET("/threads", threadHandler.GetManyThreads)
-    router.PUT("/threads/:id", threadHandler.UpdateThread)
-    router.DELETE("/threads/:id", threadHandler.DeleteThread)
+    threadHandler := threads.NewThreadHandler(threadService)
+    threadRoutes := router.Group("/api/v1/threads")
+    {
+        threadRoutes.POST("", threadHandler.CreateThread)
+        threadRoutes.GET("/:id", threadHandler.GetThread)
+        threadRoutes.GET("", threadHandler.GetManyThreads)
+        threadRoutes.PUT("/:id", threadHandler.UpdateThread)
+        threadRoutes.DELETE("/:id", threadHandler.DeleteThread)
+    }
 
     return router
 }

@@ -4,30 +4,28 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"log/slog"
 	"os"
 	"github.com/Potagashev/breddit/internal/config"
-	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 	"github.com/Potagashev/breddit/internal/threads"
 	"github.com/Potagashev/breddit/internal/router"
 )
 
-
-const (
-	envLocal = "local"
-	envDev = "dev"
-	envProd = "prod"
-)
-
-
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server.
+// @host localhost:8080
+// @BasePath /api/v1
 func main() {
 	cfg := config.MustLoad()
 	
-	logger := setupLogger(cfg.Env)
-
-	initTables(cfg.DbUrl)
-	logger.Info("db tables created")
+	err := initTables(cfg.DbUrl)
+	if err != nil {
+		log.Println("db was NOT created")
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+        os.Exit(1)
+	}
+	log.Println("db tables created")
 
 	conn, err := pgx.Connect(context.Background(), cfg.DbUrl)
 	if err != nil {
@@ -44,32 +42,6 @@ func main() {
 	r.Run("localhost:8080")
 }
 
-func getHelloWorld(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Hello World!",
-	})
-}
-
-func setupLogger(env string) *slog.Logger {
-	var logger *slog.Logger
-
-	switch env {
-	case envLocal:
-		logger = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
-	case envDev:
-		logger = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
-	case envProd:
-		logger = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
-		)
-	}
-	return logger
-}
-
 func initTables(dbUrl string) error {
 	log.Printf("Connecting to database: %s", dbUrl)
 	conn, err := pgx.Connect(context.Background(), dbUrl)
@@ -83,7 +55,7 @@ func initTables(dbUrl string) error {
 		context.Background(),
 		`
 		CREATE TABLE IF NOT EXISTS threads (
-			id UUID PRIMARY KEY,
+			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			title TEXT NOT NULL,
 			text TEXT NOT NULL,
 			created_at TIMESTAMPTZ NOT NULL default now(),
@@ -92,8 +64,9 @@ func initTables(dbUrl string) error {
 		`,
 	)
 	if err != nil {
-		return fmt.Errorf("unable to insert row: %w", err)
+		return err
 	}
+	log.Println("Tables has been created")
 
 	return nil
 }

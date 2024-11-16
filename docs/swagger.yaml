@@ -1,0 +1,114 @@
+basePath: /api/v1
+definitions:
+  threads.Thread:
+    properties:
+      id:
+        type: string
+      text:
+        type: string
+      title:
+        type: string
+    type: object
+  threads.ThreadWrite:
+    properties:
+      text:
+        type: string
+      title:
+        type: string
+    type: object
+  threads.ThreadWriteResponse:
+    properties:
+      id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /threads:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/threads.Thread'
+            type: array
+      summary: List threads
+      tags:
+      - threads
+    post:
+      parameters:
+      - description: Create data
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/threads.ThreadWrite'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/threads.ThreadWriteResponse'
+      summary: Create thread
+      tags:
+      - threads
+  /threads/{id}:
+    delete:
+      parameters:
+      - description: Thread ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses: {}
+      summary: Delete thread
+      tags:
+      - threads
+    get:
+      parameters:
+      - description: Thread ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/threads.Thread'
+      summary: Get thread
+      tags:
+      - threads
+    put:
+      parameters:
+      - description: Thread ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update data
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/threads.ThreadWrite'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/threads.ThreadWriteResponse'
+      summary: Update thread
+      tags:
+      - threads
+swagger: "2.0"

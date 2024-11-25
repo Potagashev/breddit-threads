@@ -17,7 +17,7 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
-	cfg := config.MustLoad()
+	cfg, _ := config.LoadConfig()
 	
 	err := initTables(cfg.DbUrl)
 	if err != nil {
@@ -39,7 +39,7 @@ func main() {
 	
 	r := router.NewRouter(threads_service)
 	
-	r.Run("localhost:8080")
+	r.Run(fmt.Sprintf(":%s", cfg.AppPort))
 }
 
 func initTables(dbUrl string) error {

@@ -1,39 +1,55 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
-	"time"
-	"github.com/ilyakaznacheev/cleanenv"
 )
 
-
-type HTTPServerConfig struct {
-	Host    string        `yaml:"host" env-default:"0.0.0.0"`
-	Port    string        `yaml:"port" env-default:"8080"`
-	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
-}
-
 type Config struct {
-	Env     string         `yaml:"env"`
-	DbUrl   string         `yaml:"db_url" env-required:"true"`
-	HTTP    HTTPServerConfig
+	AppPort string
+	
+	DbName string
+	DbUser string
+	DbPassword string
+	DbHost string
+	DbPort string
+	DbUrl string
 }
 
-func MustLoad() Config {
-	configPath := ".\\config\\local.yaml" // TODO remove hardcode
-	if configPath == "" {
-		log.Fatal("CONFIG_PATH is not set")
-	}
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatalf("config file %s doesn't exist", configPath)
-	}
+func LoadConfig() (*Config, error) {
+	dbName := mustGetEnv("POSTGRES_DB")
+	dbUser := mustGetEnv("POSTGRES_USER")
+	dbPassword := mustGetEnv("POSTGRES_PASSWORD")
+	dbHost := mustGetEnv("DATABASE_HOST")
+	dbPort := mustGetEnv("DATABASE_PORT")
+	dbUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	var cfg Config
+	appPort := getEnv("APP_PORT", "8080")
 
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		log.Fatal("cannot read config file: ", err)
+	return &Config{
+		DbName: dbName,
+		DbUser: dbUser,
+		DbPassword: dbPassword,
+		DbHost: dbHost,
+		DbPort: dbPort,
+		DbUrl: dbUrl,
+		
+		AppPort: appPort,
+	}, nil
+}
+
+func getEnv(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
 	}
+	return defaultValue
+}
 
-	return cfg
+func mustGetEnv(key string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	fmt.Fprintf(os.Stderr, "Fatal error: environment variable %s is not set\n", key)
+	os.Exit(1)
+	return ""
 }

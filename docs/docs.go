@@ -9,16 +9,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -56,6 +47,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/threads.ThreadWrite"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Access-Token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -63,6 +61,33 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/threads.ThreadWriteResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/threads/token": {
+            "post": {
+                "tags": [
+                    "threads"
+                ],
+                "summary": "Create token",
+                "parameters": [
+                    {
+                        "description": "Create data",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/threads.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -146,13 +171,16 @@ const docTemplate = `{
         "threads.Thread": {
             "type": "object",
             "properties": {
+                "content": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
-                "text": {
+                "title": {
                     "type": "string"
                 },
-                "title": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -172,6 +200,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "threads.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

@@ -8,4 +8,6 @@ RUN go build -o main .
 FROM alpine
 WORKDIR /root/
 COPY --from=builder /app/main .
+ADD . /app
+
 CMD ["./main"]

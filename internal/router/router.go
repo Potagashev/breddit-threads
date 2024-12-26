@@ -8,12 +8,11 @@ import (
 	"github.com/Potagashev/breddit/internal/threads"
 )
 
-func NewRouter(threadService *threads.ThreadService) *gin.Engine {
+func NewRouter(threadHandler *threads.ThreadHandler) *gin.Engine {
     router := gin.Default()
 
     router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-    threadHandler := threads.NewThreadHandler(threadService)
     threadRoutes := router.Group("/api/v1/threads")
     {
         threadRoutes.POST("", threadHandler.CreateThread)

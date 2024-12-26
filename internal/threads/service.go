@@ -18,8 +18,12 @@ func NewThreadService(threadRepo *ThreadRepository) *ThreadService {
 	return &ThreadService{ThreadRepository: threadRepo}
 }
 
-func (s *ThreadService) CreateThread(thread *ThreadWrite) (uuid.UUID, error) {
-	return s.ThreadRepository.Create(thread)
+func (s *ThreadService) CreateThread(thread *ThreadWrite, userId uuid.UUID) (uuid.UUID, error) {
+	threadCreateData := ThreadWriteDB{
+		ThreadWrite: *thread,
+		UserId: userId,
+	}
+	return s.ThreadRepository.Create(&threadCreateData)
 }
 
 func (s *ThreadService) GetThreadByID(id uuid.UUID) (*Thread, error) {

@@ -2,11 +2,13 @@ basePath: /api/v1
 definitions:
   threads.Thread:
     properties:
+      content:
+        type: string
       id:
         type: string
-      text:
-        type: string
       title:
+        type: string
+      userId:
         type: string
     type: object
   threads.ThreadWrite:
@@ -21,17 +23,19 @@ definitions:
       id:
         type: string
     type: object
+  threads.User:
+    properties:
+      email:
+        type: string
+      userId:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
+  contact: {}
   description: This is a sample server.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
   title: Swagger Example API
   version: "1.0"
 paths:
@@ -55,6 +59,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/threads.ThreadWrite'
+      - description: Access Token
+        in: header
+        name: Access-Token
+        required: true
+        type: string
       responses:
         "201":
           description: Created
@@ -109,6 +118,23 @@ paths:
           schema:
             $ref: '#/definitions/threads.ThreadWriteResponse'
       summary: Update thread
+      tags:
+      - threads
+  /threads/token:
+    post:
+      parameters:
+      - description: Create data
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/threads.User'
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+      summary: Create token
       tags:
       - threads
 swagger: "2.0"

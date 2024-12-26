@@ -27,8 +27,9 @@ func main() {
 
 	threads_repository := threads.NewThreadRepository(conn)
 	threads_service := threads.NewThreadService(threads_repository)
-	
-	r := router.NewRouter(threads_service)
+	threads_handler := threads.NewThreadHandler(threads_service, cfg)
+
+	r := router.NewRouter(threads_handler)
 	
 	r.Run(fmt.Sprintf(":%s", cfg.AppPort))
 }

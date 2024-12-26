@@ -15,10 +15,10 @@ func NewThreadRepository(db *pgx.Conn) *ThreadRepository {
 	return &ThreadRepository{DB: db}
 }
 
-func (r *ThreadRepository) Create(thread *ThreadWrite) (uuid.UUID, error) {
+func (r *ThreadRepository) Create(thread *ThreadWriteDB) (uuid.UUID, error) {
 	var threadId uuid.UUID
-	query := `INSERT INTO threads (title, text) VALUES ($1, $2) RETURNING id as threadId`
-	err := r.DB.QueryRow(context.Background(), query, thread.Title, thread.Text).Scan(&threadId)
+	query := `INSERT INTO threads (title, text, user_id) VALUES ($1, $2, $3) RETURNING id as threadId`
+	err := r.DB.QueryRow(context.Background(), query, thread.Title, thread.Text, thread.UserId).Scan(&threadId)
 	if err != nil {
 		return threadId, err
 	}
@@ -27,8 +27,8 @@ func (r *ThreadRepository) Create(thread *ThreadWrite) (uuid.UUID, error) {
 
 func (r *ThreadRepository) GetByID(id uuid.UUID) (*Thread, error) {
 	thread := &Thread{}
-	query := `SELECT id, title, text FROM threads WHERE id = $1`
-	err := r.DB.QueryRow(context.Background(), query, id).Scan(&thread.ID, &thread.Title, &thread.Text)
+	query := `SELECT id, title, text, user_id FROM threads WHERE id = $1`
+	err := r.DB.QueryRow(context.Background(), query, id).Scan(&thread.ID, &thread.Title, &thread.Text, &thread.UserId)
 	if err != nil {
 		return nil, err
 	}

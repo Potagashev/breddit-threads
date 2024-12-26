@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -14,9 +16,16 @@ type Config struct {
 	DbHost string
 	DbPort string
 	DbUrl string
+
+	JWTSecret string
 }
 
 func LoadConfig() (*Config, error) {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "An error occured while loading environmental variables from file")
+		os.Exit(1)
+	}
 	dbName := mustGetEnv("POSTGRES_DB")
 	dbUser := mustGetEnv("POSTGRES_USER")
 	dbPassword := mustGetEnv("POSTGRES_PASSWORD")
@@ -35,6 +44,8 @@ func LoadConfig() (*Config, error) {
 		DbUrl: dbUrl,
 		
 		AppPort: appPort,
+
+		JWTSecret: mustGetEnv("JWT_SECRET"),
 	}, nil
 }
 

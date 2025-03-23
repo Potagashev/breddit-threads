@@ -66,33 +66,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/threads/token": {
-            "post": {
-                "tags": [
-                    "threads"
-                ],
-                "summary": "Create token",
-                "parameters": [
-                    {
-                        "description": "Create data",
-                        "name": "requestBody",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/threads.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/threads/{id}": {
             "get": {
                 "tags": [
@@ -200,20 +173,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "threads.User": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

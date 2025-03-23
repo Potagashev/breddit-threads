@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"github.com/Potagashev/breddit/internal/config"
+
+	"github.com/Potagashev/breddit_threads/internal/config"
+	"github.com/Potagashev/breddit_threads/internal/router"
+	"github.com/Potagashev/breddit_threads/internal/threads"
 	"github.com/jackc/pgx/v5"
-	"github.com/Potagashev/breddit/internal/threads"
-	"github.com/Potagashev/breddit/internal/router"
 )
 
 // @title Swagger Example API
@@ -17,7 +18,7 @@ import (
 // @BasePath /api/v1
 func main() {
 	cfg, _ := config.LoadConfig()
-	
+
 	conn, err := pgx.Connect(context.Background(), cfg.DbUrl)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
@@ -30,6 +31,6 @@ func main() {
 	threads_handler := threads.NewThreadHandler(threads_service, cfg)
 
 	r := router.NewRouter(threads_handler)
-	
+
 	r.Run(fmt.Sprintf(":%s", cfg.AppPort))
 }

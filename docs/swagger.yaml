@@ -23,15 +23,6 @@ definitions:
       id:
         type: string
     type: object
-  threads.User:
-    properties:
-      email:
-        type: string
-      userId:
-        type: string
-      username:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -118,23 +109,6 @@ paths:
           schema:
             $ref: '#/definitions/threads.ThreadWriteResponse'
       summary: Update thread
-      tags:
-      - threads
-  /threads/token:
-    post:
-      parameters:
-      - description: Create data
-        in: body
-        name: requestBody
-        required: true
-        schema:
-          $ref: '#/definitions/threads.User'
-      responses:
-        "201":
-          description: Created
-          schema:
-            type: string
-      summary: Create token
       tags:
       - threads
 swagger: "2.0"

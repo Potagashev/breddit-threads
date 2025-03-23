@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -21,11 +22,20 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	err := godotenv.Load()
+	needToParseEnvFileString := getEnv("NEED_TO_PARSE_ENV_FILE", "false")
+	needToParseEnvFileBool, err := strconv.ParseBool(needToParseEnvFileString)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "An error occured while loading environmental variables from file")
+		fmt.Fprintf(os.Stderr, "Environmental variable 'NEED_TO_PARSE_ENV_FILE' cannot be parsed as boolean")
 		os.Exit(1)
 	}
+	if needToParseEnvFileBool {
+		err := godotenv.Load()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "An error occured while loading environmental variables from file")
+			os.Exit(1)
+		}	
+	}
+
 	dbName := mustGetEnv("POSTGRES_DB")
 	dbUser := mustGetEnv("POSTGRES_USER")
 	dbPassword := mustGetEnv("POSTGRES_PASSWORD")

@@ -3,15 +3,15 @@ package threads
 import (
 	"net/http"
 
-	"github.com/Potagashev/breddit/internal/config"
-	"github.com/Potagashev/breddit/internal/utils"
+	"github.com/Potagashev/breddit_threads/internal/config"
+	"github.com/Potagashev/breddit_threads/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type ThreadHandler struct {
 	ThreadService *ThreadService
-	Cfg *config.Config
+	Cfg           *config.Config
 }
 
 func NewThreadHandler(threadService *ThreadService, cfg *config.Config) *ThreadHandler {

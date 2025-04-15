@@ -1,21 +1,23 @@
 package threads
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/Potagashev/breddit_threads/internal/auth"
 	"github.com/Potagashev/breddit_threads/internal/config"
-	"github.com/Potagashev/breddit_threads/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 type ThreadHandler struct {
 	ThreadService *ThreadService
+	AuthService   *auth.AuthService
 	Cfg           *config.Config
 }
 
-func NewThreadHandler(threadService *ThreadService, cfg *config.Config) *ThreadHandler {
-	return &ThreadHandler{ThreadService: threadService, Cfg: cfg}
+func NewThreadHandler(threadService *ThreadService, authService *auth.AuthService, cfg *config.Config) *ThreadHandler {
+	return &ThreadHandler{ThreadService: threadService, AuthService: authService, Cfg: cfg}
 }
 
 // @Summary Create thread
@@ -30,18 +32,17 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing Access-Token header"})
 		return
 	}
-
 	const bearerPrefix = "Bearer "
 	if len(authHeader) <= len(bearerPrefix) || authHeader[:len(bearerPrefix)] != bearerPrefix {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization header format"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Access-Token header format"})
 		return
 	}
 
 	tokenString := authHeader[len(bearerPrefix):]
-
-	user, errr := utils.ParseToken(tokenString, *h.Cfg)
+	user, errr := h.AuthService.GetUserByToken(tokenString)
 
 	if errr != nil {
+		fmt.Println(errr)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
 		return
 	}
@@ -51,7 +52,7 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
-
+	
 	var threadId, err = h.ThreadService.CreateThread(&thread, user.UserId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

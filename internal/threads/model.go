@@ -9,7 +9,7 @@ type ThreadWrite struct {
 
 type ThreadWriteDB struct {
     ThreadWrite
-    UserId uuid.UUID
+    UserId string
 }
 
 type ThreadWriteResponse struct {
